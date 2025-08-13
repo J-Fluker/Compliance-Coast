@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PCI DSS Laugh & Learn Quiz</title>
+<style>
+    body { 
+        font-family: Arial, sans-serif; 
+        background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); 
+        color: #fff; 
+        padding: 20px;
+    }
+    h1 { 
+        text-align: center; 
+        color: #ffcc00; 
+        text-shadow: 1px 1px 3px #000; 
+    }
+    .question { 
+        background: rgba(255,255,255,0.1); 
+        padding: 15px; 
+        margin: 15px 0; 
+        border-radius: 8px; 
+        box-shadow: 0 2px 5px rgba(0,0,0,0.4); 
+        animation: fadeIn 0.6s ease-in-out;
+    }
+    .answers label { display: block; margin: 5px 0; }
+    button { 
+        margin-top: 10px; 
+        padding: 10px 14px; 
+        cursor: pointer; 
+        background: #ffcc00; 
+        color: #000; 
+        border: none; 
+        border-radius: 5px; 
+        font-weight: bold; 
+        transition: transform 0.2s;
+    }
+    button:hover { transform: scale(1.05); }
+    #results { 
+        font-size: 1.2em; 
+        text-align: center; 
+        padding: 20px; 
+        background: rgba(0,255,0,0.15); 
+        border-radius: 8px; 
+        margin-top: 20px; 
+        display: none; 
+        animation: popIn 0.5s ease-in-out;
+    }
+    #shareLink { 
+        display: none; 
+        margin-top: 10px; 
+        font-size: 0.9em; 
+        text-align: center;
+    }
+    #progressBarContainer {
+        background: rgba(255,255,255,0.1);
+        border-radius: 20px;
+        overflow: hidden;
+        height: 20px;
+        margin-bottom: 20px;
+    }
+    #progressBar {
+        background: #ffcc00;
+        height: 100%;
+        width: 0%;
+        transition: width 0.3s ease;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes popIn {
+        0% { transform: scale(0.5); opacity: 0; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+</style>
+</head>
+<body>
+
+<h1>PCI DSS Laugh & Learn Quiz</h1>
+
+<div id="progressBarContainer">
+    <div id="progressBar"></div>
+</div>
+
+<form id="quizForm">
+
+<!-- Questions -->
+<script>
+const questions = [
+    { q: "The firewall is like which of the following?", a: ["A","D"], opts: [
+        "A) A velvet rope outside a nightclub",
+        "B) An “Out of Office” email reply",
+        "C) Your fridge door",
+        "D) The “I don’t talk to strangers” rule from kindergarten"
+    ]},
+    { q: "What’s wrong with leaving the default password “admin123”?", a: ["B","D"], opts: [
+        "A) Nothing, hackers are polite",
+        "B) It’s basically a welcome mat for attackers",
+        "C) It’s easier for everyone to remember",
+        "D) PCI DSS auditors will develop a facial twitch"
+    ]},
+    { q: "Storing cardholder data in plaintext is like:", a: ["A","B"], opts: [
+        "A) Leaving your diary on a park bench",
+        "B) Taping your PIN to your debit card",
+        "C) Hiding your chocolate stash under “Not Chocolate”",
+        "D) Forgetting your Netflix password"
+    ]},
+    { q: "Why encrypt card data in transit?", a: ["A","B","D"], opts: [
+        "A) Because hackers love free Wi-Fi too",
+        "B) To make intercepted data useless",
+        "C) So your boss thinks you’re a wizard",
+        "D) To meet PCI DSS compliance"
+    ]},
+    { q: "The best way to avoid malware is:", a: ["A","D"], opts: [
+        "A) Keep antivirus up-to-date",
+        "B) Click suspicious links because they “look fun”",
+        "C) Never patch your system",
+        "D) Avoid plugging in “free USB drives” from the parking lot"
+    ]},
+    { q: "You should patch vulnerabilities:", a: ["A","D"], opts: [
+        "A) Immediately after they’re discovered",
+        "B) Once Mercury is out of retrograde",
+        "C) Only when your system crashes",
+        "D) As part of a regular patching schedule"
+    ]},
+    { q: "Which is NOT “Need-to-Know” access?", a: ["B","D"], opts: [
+        "A) Customer service needing last 4 digits",
+        "B) Marketing needing full card number",
+        "C) Finance processing a refund",
+        "D) A random intern poking around"
+    ]},
+    { q: "The most secure authentication is:", a: ["A","C"], opts: [
+        "A) Multi-factor authentication (MFA)",
+        "B) “Password1”",
+        "C) Biometric + password combo",
+        "D) A sticky note under your keyboard"
+    ]},
+    { q: "Which is a bad practice?", a: ["C"], opts: [
+        "A) Locking server rooms",
+        "B) Security badges for access",
+        "C) Leaving printed cardholder data on your desk",
+        "D) Escorting visitors in secure areas"
+    ]},
+    { q: "Why log system activity?", a: ["A","B","D"], opts: [
+        "A) To investigate security incidents",
+        "B) To prove to auditors you did your homework",
+        "C) To replay your best keyboard clicks",
+        "D) To catch suspicious activity before it gets worse"
+    ]},
+    { q: "Which is a valid security test?", a: ["A","B","D"], opts: [
+        "A) Penetration testing",
+        "B) Vulnerability scanning",
+        "C) Asking hackers nicely to stay away",
+        "D) Quarterly scans"
+    ]},
+    { q: "A PCI DSS security policy should:", a: ["A","B","D"], opts: [
+        "A) Be written down and accessible",
+        "B) Be updated regularly",
+        "C) Collect dust on a shelf",
+        "D) Train employees on responsibilities"
+    ]}
+];
+</script>
+
+</form>
+
+<button type="button" onclick="submitQuiz()">Submit Quiz</button>
+
+<div id="results"></div>
+<div id="shareLink"></div>
+
+<script>
+const form = document.getElementById("quizForm");
+
+// Dynamically add questions
+questions.forEach((qObj, idx) => {
+    let qDiv = document.createElement("div");
+    qDiv.className = "question";
+    qDiv.innerHTML = `<p>${idx+1}. ${qObj.q}</p><div class="answers"></div>`;
+    let ansDiv = qDiv.querySelector(".answers");
+    qObj.opts.forEach((opt, optIdx) => {
+        let label = document.createElement("label");
+        label.innerHTML = `<input type="checkbox" name="q${idx+1}" value="${String.fromCharCode(65+optIdx)}"> ${opt}`;
+        ansDiv.appendChild(label);
+    });
+    form.appendChild(qDiv);
+});
+
+// Progress bar
+form.addEventListener("change", () => {
+    let answered = 0;
+    questions.forEach((_, idx) => {
+        if (document.querySelector(`input[name="q${idx+1}"]:checked`)) {
+            answered++;
+        }
+    });
+    document.getElementById("progressBar").style.width = `${(answered/questions.length)*100}%`;
+});
+
+function submitQuiz() {
+    let score = 0;
+    let total = questions.length;
+
+    questions.forEach((qObj, idx) => {
+        let selected = [...document.querySelectorAll(`input[name="q${idx+1}"]:checked`)].map(cb => cb.value);
+        let correct = qObj.a;
+        if (selected.length === correct.length && selected.every(v => correct.includes(v))) {
+            score++;
+        }
+    });
+
+    let resultsDiv = document.getElementById("results");
+    resultsDiv.style.display = "block";
+    resultsDiv.innerHTML = `You scored <strong>${score}</strong> out of <strong>${total}</strong>.<br>` +
+        (score === total ? "🎉 Perfect score! You’re a PCI DSS master!" : 
+        score > total/2 ? "👍 Nice work — just a little polishing and you’re golden." : 
+        "😅 Time to hit the PCI DSS books again!");
+
+    let shareDiv = document.getElementById("shareLink");
+    let shareURL = window.location.href.split("?")[0] + `?score=${score}&total=${total}`;
+    shareDiv.style.display = "block";
+    shareDiv.innerHTML = `📢 Share your score: <a href="${shareURL}">${shareURL}</a>`;
+}
+
+// Shared score view
+window.onload = function() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.has("score")) {
+        let score = params.get("score");
+        let total = params.get("total");
+        document.getElementById("results").style.display = "block";
+        document.getElementById("results").innerHTML = `Someone scored <strong>${score}</strong> out of <strong>${total}</strong> on the PCI DSS Laugh & Learn Quiz! Can you beat them?`;
+    }
+};
+</script>
+
+</body>
+</html>
